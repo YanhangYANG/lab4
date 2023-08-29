@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import EventListView from '../views/EventListView.vue'
-import AboutView from '../views/AboutView.vue'
+import AboutView from '../views/OrgListView.vue'
 import StudentView from '../views/StudentView.vue'
 import MenuView from '../views/MenuView.vue'
 import EventDetailView from '../views/event/EventDetailView.vue'
@@ -12,6 +12,12 @@ import NetworkErrorView from '@/views/NetworkErrorView.vue'
 import NProgress from 'nprogress'
 import EventService from '@/services/EventService'
 import { useEventStore } from '@/stores/event'
+import OrgLayoutView from "@/views/org/OrgLayoutView.vue";
+import {useOrgStore} from "@/stores/org";
+import OrgService from "@/services/OrgService";
+import OrgDetailView from "@/views/org/OrgDetailView.vue";
+import OrgEditView from "@/views/org/OrgEditView.vue";
+import OrgRegisterView from "@/views/org/OrgRegisterView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,7 +34,11 @@ const router = createRouter({
     {
       path: '/about',
       name: 'about',
-      component: AboutView
+      component: AboutView,
+      props: (route) => ({
+        page: parseInt((route.query?.page as string) || '1'),
+        size: parseInt((route.query?.size as string) || '2')
+      })
     },
     {
       path: '/event/:id',
@@ -70,6 +80,50 @@ const router = createRouter({
           path: 'register',
           name: 'event-register',
           component: EventRegisterView,
+          props: true
+        }
+      ]
+    },
+    {
+      path: '/org/:id',
+      name: 'org-layout',
+      component: OrgLayoutView,
+      props: true,
+      beforeEnter: (to) => {
+        const id : number = parseInt(to.params.id as string)
+        const OrgStore = useOrgStore()
+        return OrgService.getOrgById(id)
+            .then((response) => {
+              OrgStore.setOrg(response.data)
+            })
+            .catch((error) => {
+              if (error.response && error.response.status === 404) {
+                return {
+                  name: '404-resource',
+                  params: { resource: 'event' }
+                }
+              }else{
+                return { name: 'network-error' }
+              }
+            })
+      },
+      children: [
+        {
+          path: '',
+          name: 'org-detail',
+          component: OrgDetailView,
+          props: true
+        },
+        {
+          path: 'edit',
+          name: 'org-edit',
+          component: OrgEditView,
+          props: true
+        },
+        {
+          path: 'register',
+          name: 'org-register',
+          component: OrgRegisterView,
           props: true
         }
       ]

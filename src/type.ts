@@ -20,3 +20,10 @@ export interface StudentItem {
   penAmount: number
   description: string
 }
+
+export interface OrgItem {
+    id: number
+    name: string
+    address: string
+
+}
