@@ -25,15 +25,15 @@ const props = defineProps({
   size: {
     type: Number,
     required: false,
-    default: 8
+    default: 4
   }
 })
 
-EventService.getEvent(props.size, props.page).then((response: AxiosResponse<EventItem[]>) => {
+EventService.getEvent(4, props.page).then((response: AxiosResponse<EventItem[]>) => {
   events.value = response.data
 })
 
-EventService.getEvent(8,props.page).then((response: AxiosResponse<EventItem[]>) => {
+EventService.getEvent(4,props.page).then((response: AxiosResponse<EventItem[]>) => {
   events.value = response.data
   totalEvents.value = response.headers['x-total-count']
 }).catch((error) => {
@@ -44,7 +44,7 @@ EventService.getEvent(8,props.page).then((response: AxiosResponse<EventItem[]>) 
 onBeforeRouteUpdate((to, from, next) => {
   const topage = Number(to.query.page)
   
-  EventService.getEvent(8, topage).then((response: AxiosResponse<EventItem[]>) => {
+  EventService.getEvent(4, topage).then((response: AxiosResponse<EventItem[]>) => {
     events.value = response.data
     totalEvents.value = response.headers['x-total-count']
     next()
